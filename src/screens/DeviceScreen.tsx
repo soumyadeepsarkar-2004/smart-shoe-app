@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { typography, spacing, useTheme, ThemePalette } from '@/theme';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { typography, spacing, radius, useTheme, ThemePalette } from '@/theme';
 import GlassCard from '@/components/GlassCard';
 import LedSwatches from '@/components/LedSwatches';
 import PressableButton from '@/components/PressableButton';
@@ -62,27 +63,100 @@ export default function DeviceScreen() {
         />
       </View>
 
-      <GlassCard title="Shoe Link">
-        <Text style={[typography.headlineSm as any, styles.deviceName]}>
-          {state.name}
-        </Text>
-        <PressableButton
-          title={connected ? 'Disconnect' : 'Connect'}
-          variant={connected ? 'destructive' : 'primary'}
-          disabled={state.connectionState === 'connecting'}
-          onPress={onConnectPress}
-        />
-        <PressableButton
-          title="Scan for shoes"
-          variant="glass"
-          onPress={() => {
-            hapticFeedback(toggles, 'light');
-            setScannerVisible(true);
-          }}
-        />
+      <GlassCard title="Hardware Link" elevated>
+        <View style={styles.deviceCardHeader}>
+          <View style={styles.deviceIconBadge}>
+            <FontAwesome5 name="shoe-prints" size={20} color={palette.brand.volt} />
+          </View>
+          <View style={styles.deviceMeta}>
+            <Text style={[typography.headlineSm as any, styles.deviceName]}>
+              {state.name}
+            </Text>
+            <Text style={[typography.labelSm as any, styles.deviceSerial]}>
+              MAC: 7E:A4:91:02:KV · BLE 5.3
+            </Text>
+          </View>
+          <View
+            style={[
+              styles.statusPill,
+              {
+                backgroundColor: connected
+                  ? 'rgba(48, 209, 88, 0.16)'
+                  : 'rgba(255, 59, 48, 0.16)',
+                borderColor: connected ? palette.brand.success : palette.brand.danger,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.statusDot,
+                {
+                  backgroundColor: connected
+                    ? palette.brand.success
+                    : palette.brand.danger,
+                },
+              ]}
+            />
+            <Text
+              style={[
+                typography.labelSm as any,
+                {
+                  color: connected ? palette.brand.success : palette.brand.danger,
+                  fontSize: 9,
+                },
+              ]}
+            >
+              {connected ? 'ONLINE' : 'OFFLINE'}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.hardwareStats}>
+          <View style={styles.statBox}>
+            <Text style={[typography.labelSm as any, styles.statLabel]}>CHARGE</Text>
+            <Text style={[typography.metricMd as any, styles.statVal]}>
+              {state.battery.percent}%
+            </Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={[typography.labelSm as any, styles.statLabel]}>SIGNAL</Text>
+            <Text style={[typography.metricMd as any, styles.statVal]}>
+              {connected ? '-62 dBm' : '—'}
+            </Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={[typography.labelSm as any, styles.statLabel]}>PIEZO</Text>
+            <Text
+              style={[
+                typography.metricMd as any,
+                { color: palette.brand.volt },
+              ]}
+            >
+              {connected ? 'ACTIVE' : 'IDLE'}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.deviceActions}>
+          <PressableButton
+            title={connected ? 'Disconnect Shoe' : 'Connect Shoe'}
+            variant={connected ? 'destructive' : 'primary'}
+            disabled={state.connectionState === 'connecting'}
+            onPress={onConnectPress}
+          />
+          <PressableButton
+            title="Scan for nearby footwear"
+            variant="glass"
+            onPress={() => {
+              hapticFeedback(toggles, 'light');
+              setScannerVisible(true);
+            }}
+          />
+        </View>
+
         {state.connectionState === 'connecting' && (
           <Text style={[typography.bodySm as any, styles.connectingHint]}>
-            Establishing link with the sole module…
+            Establishing encrypted BLE link with piezo sole…
           </Text>
         )}
       </GlassCard>
@@ -126,6 +200,7 @@ const createStyles = (colors: ThemePalette) =>
     },
     content: {
       padding: spacing.screenPaddingMobile,
+      paddingBottom: spacing.contentBottomPadding,
       gap: spacing.md,
     },
     headerRows: {
@@ -136,6 +211,68 @@ const createStyles = (colors: ThemePalette) =>
     },
     deviceName: {
       color: colors.onBackground,
+    },
+    deviceSerial: {
+      color: colors.outline,
+      fontSize: 10,
+    },
+    deviceCardHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    deviceIconBadge: {
+      width: 44,
+      height: 44,
+      borderRadius: radius.md,
+      backgroundColor: colors.iconVoltTint,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    deviceMeta: {
+      flex: 1,
+      gap: 2,
+    },
+    statusPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: radius.full,
+      borderWidth: 1,
+    },
+    statusDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 999,
+    },
+    hardwareStats: {
+      flexDirection: 'row',
+      gap: spacing.xs,
+      marginTop: spacing.xs,
+    },
+    statBox: {
+      flex: 1,
+      backgroundColor: colors.track,
+      borderRadius: radius.md,
+      padding: spacing.sm,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.glass.border,
+    },
+    statLabel: {
+      color: colors.outline,
+      fontSize: 9,
+      marginBottom: 2,
+    },
+    statVal: {
+      color: colors.onBackground,
+      fontSize: 16,
+    },
+    deviceActions: {
+      gap: spacing.sm,
+      marginTop: spacing.xs,
     },
     connectingHint: {
       color: colors.brand.cyan,

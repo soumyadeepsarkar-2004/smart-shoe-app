@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { typography, spacing, radius, useTheme, ThemePalette } from '@/theme';
 import GlassCard from '@/components/GlassCard';
 import KineticGauge from '@/components/KineticGauge';
@@ -80,9 +81,19 @@ export default function DashboardScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.headerRows}>
-        <Text style={[typography.displayLgMobile as any, styles.title]}>
-          Kinetic Volt
-        </Text>
+        <View style={styles.headerTop}>
+          <View style={styles.brandIconWrap}>
+            <FontAwesome5 name="bolt" size={20} color={palette.brand.volt} />
+          </View>
+          <View style={styles.headerTitleBlock}>
+            <Text style={[typography.displayLgMobile as any, styles.title]}>
+              Kinetic Volt
+            </Text>
+            <Text style={[typography.labelSm as any, styles.headerSubtitle]}>
+              PIEZO TELEMETRY · COCKPIT
+            </Text>
+          </View>
+        </View>
         <ConnectionBanner
           state={state.connectionState}
           deviceName={state.name}
@@ -159,13 +170,36 @@ const createStyles = (colors: ThemePalette) =>
     },
     content: {
       padding: spacing.screenPaddingMobile,
+      paddingBottom: spacing.contentBottomPadding,
       gap: spacing.md,
     },
     headerRows: {
       gap: spacing.sm,
     },
+    headerTop: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    brandIconWrap: {
+      width: 44,
+      height: 44,
+      borderRadius: radius.md,
+      backgroundColor: colors.iconVoltTint,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    headerTitleBlock: {
+      flex: 1,
+    },
     title: {
       color: colors.onBackground,
+    },
+    headerSubtitle: {
+      color: colors.brand.cyan,
+      letterSpacing: 1,
+      fontSize: 9,
+      marginTop: 2,
     },
     gaugeCard: {
       alignItems: 'center',

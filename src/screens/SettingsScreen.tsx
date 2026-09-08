@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { typography, spacing, useTheme, ThemePalette } from '@/theme';
+import { typography, spacing, radius, useTheme, ThemePalette } from '@/theme';
 import GlassCard from '@/components/GlassCard';
 import PressableButton from '@/components/PressableButton';
 import SegmentedControl from '@/components/SegmentedControl';
@@ -198,13 +198,50 @@ export default function SettingsScreen() {
         )}
       </GlassCard>
 
-      <GlassCard title="About">
+      <GlassCard title="About Kinetic Volt">
+        <View style={styles.aboutHeader}>
+          <View style={styles.aboutBadge}>
+            <FontAwesome5 name="bolt" size={18} color={palette.brand.volt} />
+          </View>
+          <View style={styles.aboutTitleBlock}>
+            <Text style={[typography.headlineSm as any, styles.aboutTitle]}>
+              KV-01 Apex
+            </Text>
+            <Text style={[typography.labelSm as any, styles.aboutSub]}>
+              Piezo-Kinetic Smart Footwear
+            </Text>
+          </View>
+        </View>
+
         <Text style={[typography.bodyMd as any, styles.about]}>
-          Kinetic Volt — companion app for smart energy-harvesting footwear.
+          Next-generation sports companion converting every stride into sustainable, stored electrical power. Engineered with dual piezo ceramic sole wafers and Bluetooth Low Energy telemetry.
         </Text>
-        <Text style={[typography.bodySm as any, styles.version]}>
-          Version 1.0.0
-        </Text>
+
+        <View style={styles.specGrid}>
+          <View style={styles.specChip}>
+            <Text style={[typography.labelSm as any, styles.specLabel]}>Cell Capacity</Text>
+            <Text style={[typography.metricMd as any, styles.specValue]}>1.1 Wh</Text>
+          </View>
+          <View style={styles.specChip}>
+            <Text style={[typography.labelSm as any, styles.specLabel]}>Max Output</Text>
+            <Text style={[typography.metricMd as any, styles.specValue]}>0.85 W</Text>
+          </View>
+          <View style={styles.specChip}>
+            <Text style={[typography.labelSm as any, styles.specLabel]}>BLE Link</Text>
+            <Text style={[typography.metricMd as any, styles.specValue]}>v5.3 LE</Text>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.aboutFooter}>
+          <Text style={[typography.labelSm as any, styles.version]}>
+            Companion App v1.0.0 (Build 42)
+          </Text>
+          <Text style={[typography.bodySm as any, styles.copyright]}>
+            © 2026 Kinetic Volt Systems. All rights reserved.
+          </Text>
+        </View>
       </GlassCard>
     </ScrollView>
   );
@@ -262,6 +299,7 @@ const createStyles = (colors: ThemePalette) =>
     },
     content: {
       padding: spacing.screenPaddingMobile,
+      paddingBottom: spacing.contentBottomPadding,
       gap: spacing.md,
     },
     title: {
@@ -318,10 +356,70 @@ const createStyles = (colors: ThemePalette) =>
       borderRadius: 9999,
       backgroundColor: colors.brand.volt,
     },
+    aboutHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      marginBottom: spacing.xxs,
+    },
+    aboutBadge: {
+      width: 36,
+      height: 36,
+      borderRadius: radius.md,
+      backgroundColor: colors.iconVoltTint,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    aboutTitleBlock: {
+      flex: 1,
+    },
+    aboutTitle: {
+      color: colors.onBackground,
+    },
+    aboutSub: {
+      color: colors.brand.cyan,
+      letterSpacing: 0.8,
+    },
     about: {
       color: colors.onSurfaceVariant,
+      lineHeight: 22,
+    },
+    specGrid: {
+      flexDirection: 'row',
+      gap: spacing.xs,
+      marginTop: spacing.xs,
+    },
+    specChip: {
+      flex: 1,
+      backgroundColor: colors.track,
+      borderRadius: radius.md,
+      padding: spacing.sm,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.glass.border,
+    },
+    specLabel: {
+      color: colors.outline,
+      fontSize: 9,
+      marginBottom: 2,
+    },
+    specValue: {
+      color: colors.onBackground,
+      fontSize: 15,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.glass.border,
+      marginVertical: spacing.xxs,
+    },
+    aboutFooter: {
+      gap: 4,
     },
     version: {
+      color: colors.brand.volt,
+    },
+    copyright: {
       color: colors.outline,
+      fontSize: 11,
     },
   });

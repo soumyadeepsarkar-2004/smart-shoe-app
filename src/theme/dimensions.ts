@@ -1,4 +1,6 @@
-import { Platform } from 'react-native';export const spacing = {
+import { Platform } from 'react-native';
+
+export const spacing = {
   xxs: 4,
   xs: 8,
   sm: 12,
@@ -9,7 +11,10 @@ import { Platform } from 'react-native';export const spacing = {
   screenPaddingMobile: 20,
   screenPaddingTablet: 32,
   cardGap: 12,
+  bottomTabBarHeight: 68,
+  contentBottomPadding: 108,
 } as const;
+
 
 export const radius = {
   sm: 4,
