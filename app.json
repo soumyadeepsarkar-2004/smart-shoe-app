@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Kinetic Volt",
+    "slug": "kinetic-volt",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "backgroundColor": "#0D1117",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kineticvolt.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0D1117"
+      },
+      "package": "com.kineticvolt.app"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
