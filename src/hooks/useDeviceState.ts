@@ -93,14 +93,18 @@ export function useDeviceState() {
         const connected = prev.connectionState === 'connected';
         const nextPowerW = connected ? randomBetween(0.35, 0.55) : 0;
         const nextCurrentMA = connected
-          ? randomBetween(90, 140)
-          : randomBetween(0, 4);
+          ? (nextPowerW / 4.2) * 1000
+          : 0;
         const telemetry: Telemetry = {
-          voltageV: connected ? randomBetween(4.1, 4.3) : 0.1,
+          voltageV: connected ? randomBetween(4.1, 4.3) : 0,
           currentMA: nextCurrentMA,
           outputPowerW: nextPowerW,
           status: rollStatus(connected),
         };
+        const next1H = connected ? nextPowerW : 0;
+        const next24H = connected ? randomBetween(0.2, 0.5) : 0;
+        const nextW = connected ? randomBetween(0.25, 0.48) : 0;
+
         return {
           ...prev,
           telemetry,
@@ -123,21 +127,11 @@ export function useDeviceState() {
                 )
               : Math.max(0, prev.battery.percent - randomBetween(0.001, 0.004)),
           },
-          powerSeries: rotateSeries(
-            [prev.powerSeries['1H'], prev.powerSeries['24H'], prev.powerSeries.W],
-            [
-              connected ? randomBetween(0.3, 0.55) : 0,
-              connected ? randomBetween(0.2, 0.5) : 0,
-              connected ? randomBetween(0.25, 0.48) : 0,
-            ]
-          ).reduce(
-            (acc, entry, index) => {
-              const key: PowerRange[] = ['1H', '24H', 'W'];
-              acc[key[index]] = entry;
-              return acc;
-            },
-            { '1H': [], '24H': [], W: [] } as DeviceState['powerSeries']
-          ),
+          powerSeries: {
+            '1H': [...prev.powerSeries['1H'].slice(1), next1H],
+            '24H': [...prev.powerSeries['24H'].slice(1), next24H],
+            W: [...prev.powerSeries.W.slice(1), nextW],
+          },
         };
       });
     }, 1800);
