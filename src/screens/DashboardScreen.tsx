@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { typography, spacing, radius, useTheme, ThemePalette } from '@/theme';
 import GlassCard from '@/components/GlassCard';
@@ -7,12 +7,14 @@ import KineticGauge from '@/components/KineticGauge';
 import MetricCard from '@/components/MetricCard';
 import EnergyBarChart from '@/components/EnergyBarChart';
 import ConnectionBanner from '@/components/ConnectionBanner';
+import PressableButton from '@/components/PressableButton';
 import SegmentedControl from '@/components/SegmentedControl';
 import SmartAlertBanner, { SmartAlert } from '@/components/SmartAlertBanner';
 import WeeklyStepsChart from '@/components/WeeklyStepsChart';
 import { useDevice } from '@/store/DeviceProvider';
 import { useSettings } from '@/store/SettingsProvider';
 import { useStepHistory } from '@/hooks/useStepHistory';
+import { hapticFeedback } from '@/utils/haptics';
 import { PowerRange } from '@/utils/deviceModel';
 
 type Range = PowerRange;
@@ -38,6 +40,42 @@ export default function DashboardScreen() {
   const styles = useMemo(() => createStyles(palette), [palette]);
   const [range, setRange] = useState<Range>('24H');
   const { records: history, ready: historyReady, noteDay } = useStepHistory();
+
+  const [workoutActive, setWorkoutActive] = useState(false);
+  const [workoutSeconds, setWorkoutSeconds] = useState(0);
+
+  useEffect(() => {
+    if (!workoutActive) return;
+    const timer = setInterval(() => {
+      setWorkoutSeconds((sec) => sec + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [workoutActive]);
+
+  const toggleWorkout = () => {
+    if (workoutActive) {
+      hapticFeedback(toggles, 'success');
+      const mins = Math.floor(workoutSeconds / 60);
+      const secs = workoutSeconds % 60;
+      const energyHarvested = ((workoutSeconds * 0.0003) + 0.02).toFixed(2);
+      Alert.alert(
+        'Workout Completed! ⚡',
+        `Duration: ${mins}m ${secs}s\nEnergy Harvested: +${energyHarvested} Wh\nAvg Cadence: 162 SPM\nGreat job keeping your stride charged!`
+      );
+      setWorkoutActive(false);
+      setWorkoutSeconds(0);
+    } else {
+      hapticFeedback(toggles, 'medium');
+      setWorkoutSeconds(0);
+      setWorkoutActive(true);
+    }
+  };
+
+  const formatWorkoutTimer = (totalSeconds: number) => {
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     if (!historyReady) return;
@@ -178,6 +216,57 @@ export default function DashboardScreen() {
         </View>
       </GlassCard>
 
+      <GlassCard title="Live Workout Tracking">
+        <View style={styles.workoutHeaderRow}>
+          <View style={styles.workoutStatusBlock}>
+            <View
+              style={[
+                styles.workoutStatusDot,
+                { backgroundColor: workoutActive ? palette.brand.volt : palette.outline },
+              ]}
+            />
+            <Text style={[typography.headlineSm as any, styles.workoutTitle]}>
+              {workoutActive ? 'Session Active' : 'Ready to Track'}
+            </Text>
+          </View>
+          <Text style={[typography.metricMd as any, styles.workoutTimer]}>
+            {formatWorkoutTimer(workoutSeconds)}
+          </Text>
+        </View>
+
+        <View style={styles.workoutMetricsRow}>
+          <View style={styles.workoutMetricChip}>
+            <Text style={[typography.labelSm as any, styles.workoutLabel]}>PACE</Text>
+            <Text style={[typography.metricMd as any, styles.workoutVal]}>
+              {workoutActive && state.connectionState === 'connected' ? '5:24' : '—'}
+            </Text>
+            <Text style={[typography.labelSm as any, styles.workoutUnit]}>min/km</Text>
+          </View>
+          <View style={styles.workoutMetricChip}>
+            <Text style={[typography.labelSm as any, styles.workoutLabel]}>SESSION HARVEST</Text>
+            <Text style={[typography.metricMd as any, { color: palette.brand.volt, fontSize: 16 }]}>
+              {workoutActive ? `+${((workoutSeconds * 0.0003) + 0.02).toFixed(2)}` : '0.00'}
+            </Text>
+            <Text style={[typography.labelSm as any, styles.workoutUnit]}>Wh</Text>
+          </View>
+          <View style={styles.workoutMetricChip}>
+            <Text style={[typography.labelSm as any, styles.workoutLabel]}>CADENCE</Text>
+            <Text style={[typography.metricMd as any, styles.workoutVal]}>
+              {workoutActive && state.connectionState === 'connected' ? '162' : '0'}
+            </Text>
+            <Text style={[typography.labelSm as any, styles.workoutUnit]}>SPM</Text>
+          </View>
+        </View>
+
+        <View style={styles.workoutActionRow}>
+          <PressableButton
+            title={workoutActive ? 'Finish Workout' : 'Start Outdoor Run'}
+            variant={workoutActive ? 'destructive' : 'primary'}
+            onPress={toggleWorkout}
+          />
+        </View>
+      </GlassCard>
+
       <GlassCard title="This Week">
         <WeeklyStepsChart records={history} />
       </GlassCard>
@@ -308,5 +397,57 @@ const createStyles = (colors: ThemePalette) =>
     fitnessUnit: {
       color: colors.outline,
       fontSize: 11,
+    },
+    workoutHeaderRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    workoutStatusBlock: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    workoutStatusDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+    },
+    workoutTitle: {
+      color: colors.onBackground,
+    },
+    workoutTimer: {
+      color: colors.brand.cyan,
+      fontVariant: ['tabular-nums'],
+    },
+    workoutMetricsRow: {
+      flexDirection: 'row',
+      gap: spacing.cardGap,
+      marginTop: spacing.xs,
+    },
+    workoutMetricChip: {
+      flex: 1,
+      backgroundColor: colors.track,
+      borderRadius: radius.md,
+      padding: spacing.sm,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.glass.border,
+    },
+    workoutLabel: {
+      color: colors.outline,
+      fontSize: 9,
+      marginBottom: 3,
+    },
+    workoutVal: {
+      color: colors.onBackground,
+      fontSize: 16,
+    },
+    workoutUnit: {
+      color: colors.outline,
+      fontSize: 11,
+    },
+    workoutActionRow: {
+      marginTop: spacing.xs,
     },
   });

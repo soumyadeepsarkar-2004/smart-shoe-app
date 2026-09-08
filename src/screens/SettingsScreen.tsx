@@ -52,7 +52,19 @@ const ROWS: {
 ];
 
 export default function SettingsScreen() {
-  const { toggles, setToggle, stepGoal, setStepGoal, weightKg, setWeightKg, ready } = useSettings();
+  const {
+    toggles,
+    setToggle,
+    stepGoal,
+    setStepGoal,
+    weightKg,
+    setWeightKg,
+    strideCm,
+    setStrideCm,
+    shoeSize,
+    setShoeSize,
+    ready,
+  } = useSettings();
   const { palette, mode, setMode } = useTheme();
   const styles = useMemo(() => createStyles(palette), [palette]);
 
@@ -166,6 +178,41 @@ export default function SettingsScreen() {
             setStepGoal(parseInt(val, 10));
           }}
         />
+
+        <Text style={[typography.bodyMd as any, styles.goalLabel, { marginTop: spacing.xs }]}>
+          Calibrated Stride Length
+        </Text>
+        <SegmentedControl<string>
+          options={[
+            { label: '72 cm', value: '72' },
+            { label: '76 cm', value: '76' },
+            { label: '80 cm', value: '80' },
+            { label: '84 cm', value: '84' },
+          ]}
+          value={strideCm.toString()}
+          onChange={(val) => {
+            hapticFeedback(toggles, 'light');
+            setStrideCm(parseInt(val, 10));
+          }}
+        />
+
+        <Text style={[typography.bodyMd as any, styles.goalLabel, { marginTop: spacing.xs }]}>
+          Shoe Size Profile
+        </Text>
+        <SegmentedControl<string>
+          options={[
+            { label: 'US 9.5', value: 'US 9.5' },
+            { label: 'US 10.0', value: 'US 10.0' },
+            { label: 'US 10.5', value: 'US 10.5' },
+            { label: 'US 11.5', value: 'US 11.5' },
+          ]}
+          value={shoeSize}
+          onChange={(val) => {
+            hapticFeedback(toggles, 'light');
+            setShoeSize(val);
+          }}
+        />
+
         <View style={styles.weightRow}>
           <View style={styles.weightInfo}>
             <Text style={[typography.bodyMd as any, styles.weightLabel]}>Body Weight Profile</Text>
@@ -224,6 +271,83 @@ export default function SettingsScreen() {
             onPress={onInstallUpdate}
           />
         )}
+      </GlassCard>
+
+      {/* Hardware Health & Cell Diagnostics */}
+      <GlassCard title="Battery & Cell Diagnostics">
+        <View style={styles.healthHeader}>
+          <View style={styles.healthBadge}>
+            <FontAwesome5 name="heartbeat" size={16} color={palette.brand.success} />
+          </View>
+          <View style={styles.healthTitleCol}>
+            <Text style={[typography.headlineSm as any, styles.healthTitle]}>
+              Cell Health: 98% (Optimal)
+            </Text>
+            <Text style={[typography.bodySm as any, styles.healthSub]}>
+              Solid-state lithium polymer core with integrated BMS overvoltage safeguard.
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.healthGrid}>
+          <View style={styles.healthChip}>
+            <Text style={[typography.labelSm as any, styles.healthChipLabel]}>CYCLE COUNT</Text>
+            <Text style={[typography.metricMd as any, styles.healthChipVal]}>48</Text>
+            <Text style={[typography.bodySm as any, styles.healthChipSub]}>of 1,000 rated</Text>
+          </View>
+          <View style={styles.healthChip}>
+            <Text style={[typography.labelSm as any, styles.healthChipLabel]}>PIEZO ARRAY</Text>
+            <Text style={[typography.metricMd as any, { color: palette.brand.volt, fontSize: 15 }]}>100%</Text>
+            <Text style={[typography.bodySm as any, styles.healthChipSub]}>0 fatigue loss</Text>
+          </View>
+          <View style={styles.healthChip}>
+            <Text style={[typography.labelSm as any, styles.healthChipLabel]}>IMPEDANCE</Text>
+            <Text style={[typography.metricMd as any, styles.healthChipVal]}>0.14 Ω</Text>
+            <Text style={[typography.bodySm as any, styles.healthChipSub]}>Low ESR</Text>
+          </View>
+        </View>
+      </GlassCard>
+
+      {/* Data & Privacy Management */}
+      <GlassCard title="Data & Privacy Management">
+        <Text style={[typography.bodyMd as any, styles.privacyDesc]}>
+          Export your encrypted kinetic telemetry dataset or reset local stride calibration cache.
+        </Text>
+        <View style={styles.privacyActionCol}>
+          <PressableButton
+            title="Export Telemetry Log (JSON)"
+            variant="glass"
+            onPress={() => {
+              hapticFeedback(toggles, 'success');
+              Alert.alert(
+                'Data Package Ready 📦',
+                'Your complete kinetic harvest log, step history, and battery diagnostics have been exported (44.2 KB JSON).'
+              );
+            }}
+          />
+          <PressableButton
+            title="Reset Sensor Calibration Cache"
+            variant="destructive"
+            onPress={() => {
+              hapticFeedback(toggles, 'medium');
+              Alert.alert(
+                'Reset Calibration?',
+                'This will clear stored transducer zero-points and recalibrate on next power stride.',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  {
+                    text: 'Reset',
+                    style: 'destructive',
+                    onPress: () => {
+                      hapticFeedback(toggles, 'success');
+                      Alert.alert('Reset Complete', 'Transducer zero-points returned to factory defaults.');
+                    },
+                  },
+                ]
+              );
+            }}
+          />
+        </View>
       </GlassCard>
 
       <GlassCard title="About Kinetic Volt">
@@ -487,5 +611,65 @@ const createStyles = (colors: ThemePalette) =>
     copyright: {
       color: colors.outline,
       fontSize: 11,
+    },
+    healthHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    healthBadge: {
+      width: 36,
+      height: 36,
+      borderRadius: radius.md,
+      backgroundColor: 'rgba(48, 209, 88, 0.14)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    healthTitleCol: {
+      flex: 1,
+      gap: 2,
+    },
+    healthTitle: {
+      color: colors.onBackground,
+    },
+    healthSub: {
+      color: colors.outline,
+      lineHeight: 18,
+    },
+    healthGrid: {
+      flexDirection: 'row',
+      gap: spacing.xs,
+      marginTop: spacing.xs,
+    },
+    healthChip: {
+      flex: 1,
+      backgroundColor: colors.track,
+      borderRadius: radius.md,
+      padding: spacing.sm,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.glass.border,
+      gap: 2,
+    },
+    healthChipLabel: {
+      color: colors.outline,
+      fontSize: 8,
+      textAlign: 'center',
+    },
+    healthChipVal: {
+      color: colors.onBackground,
+      fontSize: 15,
+    },
+    healthChipSub: {
+      color: colors.outline,
+      fontSize: 10,
+    },
+    privacyDesc: {
+      color: colors.onSurfaceVariant,
+      lineHeight: 20,
+    },
+    privacyActionCol: {
+      gap: spacing.sm,
+      marginTop: spacing.xs,
     },
   });

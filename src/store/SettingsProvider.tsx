@@ -8,10 +8,14 @@ interface SettingsContextValue {
   toggles: SettingsToggles;
   stepGoal: number;
   weightKg: number;
+  strideCm: number;
+  shoeSize: string;
   ready: boolean;
   setToggle: (key: keyof SettingsToggles, value: boolean) => void;
   setStepGoal: (goal: number) => void;
   setWeightKg: (weight: number) => void;
+  setStrideCm: (stride: number) => void;
+  setShoeSize: (size: string) => void;
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);

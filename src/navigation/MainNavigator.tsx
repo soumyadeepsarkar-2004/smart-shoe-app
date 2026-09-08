@@ -5,11 +5,13 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { typography, radius, spacing, shadow, useTheme } from '@/theme';
 import DashboardScreen from '@/screens/DashboardScreen';
+import AnalyticsScreen from '@/screens/AnalyticsScreen';
 import DeviceScreen from '@/screens/DeviceScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 
 export type MainTabParamList = {
   Dashboard: undefined;
+  Analytics: undefined;
   Device: undefined;
   Settings: undefined;
 };
@@ -18,6 +20,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const ICONS: Record<keyof MainTabParamList, string> = {
   Dashboard: 'home',
+  Analytics: 'chart-line',
   Device: 'shoe-prints',
   Settings: 'cog',
 };
@@ -78,6 +81,7 @@ export default function MainNavigator() {
       })}
     >
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
+      <Tab.Screen name="Analytics" component={AnalyticsScreen} />
       <Tab.Screen name="Device" component={DeviceScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>

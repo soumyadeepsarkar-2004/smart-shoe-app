@@ -48,13 +48,14 @@ npx expo-doctor      # project health (1 known warning: newArchEnabled schema fa
 
 ## Features
 
-- **Dashboard** — Kinetic battery/power gauge with live piezo pulse state, voltage/current/output metric cards, daily step goal with progress bar, weekly step chart (persisted daily history), and energy-harvest histogram with 1H / 24H / Week ranges.
-- **Device** — simulated BLE shoe link (scan modal, pair, connect/disconnect), LED customization (color swatches, brightness slider, static/pulse/wave/energy patterns) with persistence.
-- **Settings** — Dark/Light appearance (system default, persisted), haptic/notification/data/ambient toggles, firmware update flow with live install progress (v2.4.1 → v2.5.0).
-- **Theme system** — full dark + light palettes from DESIGN.md via a `ThemeProvider`/`useTheme`; every component is theme-aware.
-- **Smart alerts** — connection-loss and circuit-error banners with reconnect action, gated by notifications toggle.
+- **Dashboard Cockpit** — Kinetic battery/power gauge with live piezo pulse state, voltage/current/output metric cards, daily step progress, live workout tracking (pace, cadence, harvest rate, timer, and finish summary), weekly step chart, and energy-harvest histogram with 1H / 24H / Week ranges.
+- **Stride Analytics & Biomechanics** — Self-generated clean power impact (Wh, km, CO₂ offset), sole pressure foot-strike distribution (Forefoot, Midfoot peak harvest, Heel), gait dynamics (ground contact time, vertical oscillation, pronation tilt, harvest efficiency), filterable activity sessions (running/walking), and biometric dataset export.
+- **Hardware & Device Control** — Simulated BLE 5.3 footwear link, Dual Sole independent monitoring (Left vs Right shoe battery, harvest, temp, and stride symmetry balance), motorized auto-lacing tension presets (Relaxed, Commute, Athletic, Sprint) with micro-adjustments, sole haptic guidance modes (Cadence, Heel Alert, Milestone), LED customization (color swatches, brightness slider, patterns), and interactive sole sensor calibration.
+- **Settings & User Profile** — Dark/Light kinetic appearance, user biomechanical profile (daily step goal, calibrated stride length, shoe size, body weight profile), preferences toggles (haptics, notifications, telemetry, ambient lighting), OTA firmware updates with simulated flashing, battery & cell diagnostics (health %, cycle count, impedance), and local data/calibration management.
+- **Theme system** — Full dark + light palettes from `DESIGN.md` via `ThemeProvider`/`useTheme`; every component is glassmorphic, theme-aware, and responsive.
+- **Smart alerts** — Dynamic banners for connection loss, sensor circuit faults, and low battery with one-tap reconnect actions.
 
-The `useDeviceState` hook simulates live energy harvest telemetry (voltage, current, output power, step count, battery) so the UI is fully interactive without a physical shoe. BLE discovery is simulated in `src/utils/bleDiscovery.ts` — swap it for `react-native-ble-plx` when targeting a dev build.
+The `useDeviceState` hook simulates real-time kinetic energy harvest telemetry ($P = V \times I$ physics, piezoelectric transducer output, temperature, step count, and battery charging) so the companion UI is completely functional and alive without physical hardware.
 
 ## Project structure
 
@@ -63,8 +64,8 @@ App.tsx                     # root: fonts, safe area, providers, navigation them
 src/
   theme/                    # palettes, ThemeProvider, typography, spacing/radius/shadows
   components/               # KineticGauge, GlassCard, buttons, charts, scanner modal, etc.
-  screens/                  # Dashboard, Device, Settings
-  navigation/               # bottom tab navigator
+  screens/                  # Dashboard, Analytics, Device, Settings
+  navigation/               # floating pill dock bottom tab navigator
   store/                    # DeviceProvider, SettingsProvider (app-wide shared state)
   hooks/                    # useDeviceState, usePersistentSettings, useStepHistory
   utils/                    # deviceModel types, haptics, bleDiscovery
