@@ -123,9 +123,9 @@ export function useDeviceState() {
             percent: connected
               ? Math.min(
                   100,
-                  prev.battery.percent + randomBetween(0.001, 0.008)
+                  Math.round(prev.battery.percent + randomBetween(0.01, 0.05))
                 )
-              : Math.max(0, prev.battery.percent - randomBetween(0.001, 0.004)),
+              : Math.max(0, Math.round(prev.battery.percent - randomBetween(0.01, 0.03))),
           },
           powerSeries: {
             '1H': [...prev.powerSeries['1H'].slice(1), next1H],

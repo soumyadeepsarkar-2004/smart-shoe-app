@@ -125,26 +125,37 @@ export default function DeviceScreen() {
         <View style={styles.hardwareStats}>
           <View style={styles.statBox}>
             <Text style={[typography.labelSm as any, styles.statLabel]}>CHARGE</Text>
-            <Text style={[typography.metricMd as any, styles.statVal]}>
-              {state.battery.percent}%
-            </Text>
+            <View style={styles.statValueRow}>
+              <Text style={[typography.metricMd as any, styles.statVal]}>
+                {Math.round(state.battery.percent)}
+              </Text>
+              <Text style={[typography.labelSm as any, styles.statUnit]}>%</Text>
+            </View>
           </View>
           <View style={styles.statBox}>
             <Text style={[typography.labelSm as any, styles.statLabel]}>SIGNAL</Text>
-            <Text style={[typography.metricMd as any, styles.statVal]}>
-              {connected ? '-62 dBm' : '—'}
-            </Text>
+            <View style={styles.statValueRow}>
+              <Text style={[typography.metricMd as any, styles.statVal]}>
+                {connected ? '-62' : '—'}
+              </Text>
+              {connected && (
+                <Text style={[typography.labelSm as any, styles.statUnit]}>dBm</Text>
+              )}
+            </View>
           </View>
           <View style={styles.statBox}>
             <Text style={[typography.labelSm as any, styles.statLabel]}>PIEZO</Text>
-            <Text
-              style={[
-                typography.metricMd as any,
-                { color: palette.brand.volt },
-              ]}
-            >
-              {connected ? 'ACTIVE' : 'IDLE'}
-            </Text>
+            <View style={styles.statValueRow}>
+              <Text
+                style={[
+                  typography.metricMd as any,
+                  styles.statVal,
+                  { color: connected ? palette.brand.volt : palette.outline },
+                ]}
+              >
+                {connected ? 'ACTIVE' : 'IDLE'}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -205,23 +216,34 @@ export default function DeviceScreen() {
           <View style={styles.sensorNode}>
             <View style={[styles.sensorIndicator, { backgroundColor: connected ? palette.brand.volt : palette.outline }]} />
             <Text style={[typography.labelSm as any, styles.sensorNodeLabel]}>HEEL PIEZO</Text>
-            <Text style={[typography.metricMd as any, styles.sensorNodeVal]}>
-              {connected ? `${state.telemetry.voltageV.toFixed(1)} V` : '0.0 V'}
-            </Text>
+            <View style={styles.statValueRow}>
+              <Text style={[typography.metricMd as any, styles.sensorNodeVal]}>
+                {connected ? state.telemetry.voltageV.toFixed(1) : '0.0'}
+              </Text>
+              <Text style={[typography.labelSm as any, styles.statUnit]}>V</Text>
+            </View>
           </View>
           <View style={styles.sensorNode}>
             <View style={[styles.sensorIndicator, { backgroundColor: connected ? palette.brand.cyan : palette.outline }]} />
             <Text style={[typography.labelSm as any, styles.sensorNodeLabel]}>FOREFOOT HARVEST</Text>
-            <Text style={[typography.metricMd as any, styles.sensorNodeVal]}>
-              {connected ? `${(state.telemetry.outputPowerW * 0.6).toFixed(2)} W` : '0.00 W'}
-            </Text>
+            <View style={styles.statValueRow}>
+              <Text style={[typography.metricMd as any, styles.sensorNodeVal]}>
+                {connected ? (state.telemetry.outputPowerW * 0.6).toFixed(2) : '0.00'}
+              </Text>
+              <Text style={[typography.labelSm as any, styles.statUnit]}>W</Text>
+            </View>
           </View>
           <View style={styles.sensorNode}>
             <View style={[styles.sensorIndicator, { backgroundColor: connected ? palette.brand.success : palette.outline }]} />
             <Text style={[typography.labelSm as any, styles.sensorNodeLabel]}>CORE TEMP</Text>
-            <Text style={[typography.metricMd as any, styles.sensorNodeVal]}>
-              {connected ? '28.4 °C' : '—'}
-            </Text>
+            <View style={styles.statValueRow}>
+              <Text style={[typography.metricMd as any, styles.sensorNodeVal]}>
+                {connected ? '28.4' : '—'}
+              </Text>
+              {connected && (
+                <Text style={[typography.labelSm as any, styles.statUnit]}>°C</Text>
+              )}
+            </View>
           </View>
         </View>
 
@@ -315,11 +337,23 @@ const createStyles = (colors: ThemePalette) =>
     statLabel: {
       color: colors.outline,
       fontSize: 9,
-      marginBottom: 2,
+      marginBottom: 4,
+      letterSpacing: 0.5,
+    },
+    statValueRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      justifyContent: 'center',
+      gap: 2,
     },
     statVal: {
       color: colors.onBackground,
       fontSize: 16,
+      textAlign: 'center',
+    },
+    statUnit: {
+      color: colors.outline,
+      fontSize: 10,
     },
     deviceActions: {
       gap: spacing.sm,
