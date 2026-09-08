@@ -28,6 +28,7 @@ export default function DeviceScreen() {
   const { palette } = useTheme();
   const styles = useMemo(() => createStyles(palette), [palette]);
   const [scannerVisible, setScannerVisible] = useState(false);
+  const [calibrating, setCalibrating] = useState(false);
   const connected = state.connectionState === 'connected';
 
   const setLed = (patch: Partial<typeof state.led>) => {
@@ -45,6 +46,16 @@ export default function DeviceScreen() {
     hapticFeedback(toggles, 'success');
     setScannerVisible(false);
     pair(device.name);
+  };
+
+  const onCalibratePress = () => {
+    if (calibrating || !connected) return;
+    hapticFeedback(toggles, 'medium');
+    setCalibrating(true);
+    setTimeout(() => {
+      setCalibrating(false);
+      hapticFeedback(toggles, 'success');
+    }, 1800);
   };
 
   return (
@@ -183,6 +194,46 @@ export default function DeviceScreen() {
         />
       </GlassCard>
 
+      <GlassCard title="Sole Sensors & Diagnostics">
+        <View style={styles.diagHeader}>
+          <Text style={[typography.bodyMd as any, styles.diagDesc]}>
+            Real-time piezoelectric transducer and pressure array diagnostics.
+          </Text>
+        </View>
+
+        <View style={styles.sensorGrid}>
+          <View style={styles.sensorNode}>
+            <View style={[styles.sensorIndicator, { backgroundColor: connected ? palette.brand.volt : palette.outline }]} />
+            <Text style={[typography.labelSm as any, styles.sensorNodeLabel]}>HEEL PIEZO</Text>
+            <Text style={[typography.metricMd as any, styles.sensorNodeVal]}>
+              {connected ? `${state.telemetry.voltageV.toFixed(1)} V` : '0.0 V'}
+            </Text>
+          </View>
+          <View style={styles.sensorNode}>
+            <View style={[styles.sensorIndicator, { backgroundColor: connected ? palette.brand.cyan : palette.outline }]} />
+            <Text style={[typography.labelSm as any, styles.sensorNodeLabel]}>FOREFOOT HARVEST</Text>
+            <Text style={[typography.metricMd as any, styles.sensorNodeVal]}>
+              {connected ? `${(state.telemetry.outputPowerW * 0.6).toFixed(2)} W` : '0.00 W'}
+            </Text>
+          </View>
+          <View style={styles.sensorNode}>
+            <View style={[styles.sensorIndicator, { backgroundColor: connected ? palette.brand.success : palette.outline }]} />
+            <Text style={[typography.labelSm as any, styles.sensorNodeLabel]}>CORE TEMP</Text>
+            <Text style={[typography.metricMd as any, styles.sensorNodeVal]}>
+              {connected ? '28.4 °C' : '—'}
+            </Text>
+          </View>
+        </View>
+
+        <PressableButton
+          title={calibrating ? 'Calibrating Sole Piezo Sensors…' : 'Calibrate Sole Sensors'}
+          variant="glass"
+          disabled={!connected || calibrating}
+          loading={calibrating}
+          onPress={onCalibratePress}
+        />
+      </GlassCard>
+
       <DeviceScannerModal
         visible={scannerVisible}
         onClose={() => setScannerVisible(false)}
@@ -284,5 +335,42 @@ const createStyles = (colors: ThemePalette) =>
     sliderLabel: {
       color: colors.onSurfaceVariant,
       textAlign: 'center',
+    },
+    diagHeader: {
+      marginBottom: spacing.xxs,
+    },
+    diagDesc: {
+      color: colors.onSurfaceVariant,
+      lineHeight: 20,
+    },
+    sensorGrid: {
+      flexDirection: 'row',
+      gap: spacing.xs,
+      marginVertical: spacing.xs,
+    },
+    sensorNode: {
+      flex: 1,
+      backgroundColor: colors.track,
+      borderRadius: radius.md,
+      padding: spacing.sm,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.glass.border,
+      gap: 4,
+    },
+    sensorIndicator: {
+      width: 6,
+      height: 6,
+      borderRadius: 999,
+      marginBottom: 2,
+    },
+    sensorNodeLabel: {
+      color: colors.outline,
+      fontSize: 8,
+      textAlign: 'center',
+    },
+    sensorNodeVal: {
+      color: colors.onBackground,
+      fontSize: 14,
     },
   });

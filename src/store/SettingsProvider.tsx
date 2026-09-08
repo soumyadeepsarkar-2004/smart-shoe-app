@@ -6,8 +6,12 @@ import {
 
 interface SettingsContextValue {
   toggles: SettingsToggles;
+  stepGoal: number;
+  weightKg: number;
   ready: boolean;
   setToggle: (key: keyof SettingsToggles, value: boolean) => void;
+  setStepGoal: (goal: number) => void;
+  setWeightKg: (weight: number) => void;
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);

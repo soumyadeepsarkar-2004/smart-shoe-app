@@ -52,7 +52,7 @@ const ROWS: {
 ];
 
 export default function SettingsScreen() {
-  const { toggles, setToggle, ready } = useSettings();
+  const { toggles, setToggle, stepGoal, setStepGoal, weightKg, setWeightKg, ready } = useSettings();
   const { palette, mode, setMode } = useTheme();
   const styles = useMemo(() => createStyles(palette), [palette]);
 
@@ -147,6 +147,34 @@ export default function SettingsScreen() {
           Follows the kinetic cockpit aesthetic in dark, or clinical alabaster
           in light.
         </Text>
+      </GlassCard>
+
+      <GlassCard title="Fitness & Activity Goals">
+        <Text style={[typography.bodyMd as any, styles.goalLabel]}>
+          Daily Step Target
+        </Text>
+        <SegmentedControl<string>
+          options={[
+            { label: '6,000', value: '6000' },
+            { label: '8,000', value: '8000' },
+            { label: '10,000', value: '10000' },
+            { label: '12,500', value: '12500' },
+          ]}
+          value={stepGoal.toString()}
+          onChange={(val) => {
+            hapticFeedback(toggles, 'light');
+            setStepGoal(parseInt(val, 10));
+          }}
+        />
+        <View style={styles.weightRow}>
+          <View style={styles.weightInfo}>
+            <Text style={[typography.bodyMd as any, styles.weightLabel]}>Body Weight Profile</Text>
+            <Text style={[typography.bodySm as any, styles.weightDesc]}>Calibrates dynamic stride calorie burn</Text>
+          </View>
+          <View style={styles.weightBadge}>
+            <Text style={[typography.metricMd as any, styles.weightVal]}>{weightKg} kg</Text>
+          </View>
+        </View>
       </GlassCard>
 
       <GlassCard title="Preferences">
@@ -309,6 +337,44 @@ const createStyles = (colors: ThemePalette) =>
     appearanceHint: {
       color: colors.outline,
       textAlign: 'center',
+    },
+    goalLabel: {
+      color: colors.onSurfaceVariant,
+      marginBottom: 2,
+    },
+    weightRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.track,
+      borderRadius: radius.md,
+      padding: spacing.sm,
+      borderWidth: 1,
+      borderColor: colors.glass.border,
+      marginTop: spacing.xs,
+    },
+    weightInfo: {
+      flex: 1,
+      gap: 2,
+    },
+    weightLabel: {
+      color: colors.onBackground,
+    },
+    weightDesc: {
+      color: colors.outline,
+      fontSize: 11,
+    },
+    weightBadge: {
+      backgroundColor: colors.iconVoltTint,
+      borderColor: colors.brand.volt,
+      borderWidth: 1,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: radius.full,
+    },
+    weightVal: {
+      color: colors.brand.volt,
+      fontSize: 14,
     },
     row: {
       flexDirection: 'row',

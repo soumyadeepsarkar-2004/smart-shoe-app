@@ -33,7 +33,7 @@ const DAILY_STEP_GOAL = 10000;
 
 export default function DashboardScreen() {
   const { state, connect } = useDevice();
-  const { toggles } = useSettings();
+  const { toggles, stepGoal, weightKg } = useSettings();
   const { palette } = useTheme();
   const styles = useMemo(() => createStyles(palette), [palette]);
   const [range, setRange] = useState<Range>('24H');
@@ -72,7 +72,10 @@ export default function DashboardScreen() {
       : null
     : null;
 
-  const goalPercent = Math.min(100, (state.stepCount / DAILY_STEP_GOAL) * 100);
+  const goalPercent = Math.min(100, (state.stepCount / stepGoal) * 100);
+  const distanceKm = (state.stepCount * 0.00078).toFixed(2);
+  const caloriesKcal = Math.round(state.stepCount * 0.04 * (weightKg / 70));
+  const activeMinutes = Math.round(state.stepCount / 110);
 
   return (
     <ScrollView
@@ -130,16 +133,48 @@ export default function DashboardScreen() {
         />
       </View>
 
-      <GlassCard title="Step Count">
-        <Text style={[typography.metricXl as any, styles.steps]}>
-          {state.stepCount.toLocaleString()}
-        </Text>
-        <Text style={[typography.bodySm as any, styles.caption]}>
-          of {DAILY_STEP_GOAL.toLocaleString()} steps ·{' '}
-          {Math.round(goalPercent)}%
-        </Text>
+      <GlassCard title="Step Progress & Movement">
+        <View style={styles.stepHeaderRow}>
+          <View>
+            <Text style={[typography.metricXl as any, styles.steps]}>
+              {state.stepCount.toLocaleString()}
+            </Text>
+            <Text style={[typography.bodySm as any, styles.caption]}>
+              Target: {stepGoal.toLocaleString()} steps ·{' '}
+              {Math.round(goalPercent)}%
+            </Text>
+          </View>
+          <View style={styles.stridePill}>
+            <FontAwesome5 name="running" size={14} color={palette.brand.volt} />
+            <Text style={[typography.labelSm as any, styles.stridePillText]}>
+              {state.connectionState === 'connected' ? 'PACING' : 'REST'}
+            </Text>
+          </View>
+        </View>
+
         <View style={styles.goalTrack}>
           <View style={[styles.goalFill, { width: `${goalPercent}%` }]} />
+        </View>
+
+        <View style={styles.fitnessStatsGrid}>
+          <View style={styles.fitnessChip}>
+            <Text style={[typography.labelSm as any, styles.fitnessLabel]}>DISTANCE</Text>
+            <Text style={[typography.metricMd as any, styles.fitnessValue]}>
+              {distanceKm} <Text style={[typography.bodySm as any, styles.fitnessUnit]}>km</Text>
+            </Text>
+          </View>
+          <View style={styles.fitnessChip}>
+            <Text style={[typography.labelSm as any, styles.fitnessLabel]}>CALORIES</Text>
+            <Text style={[typography.metricMd as any, styles.fitnessValue]}>
+              {caloriesKcal} <Text style={[typography.bodySm as any, styles.fitnessUnit]}>kcal</Text>
+            </Text>
+          </View>
+          <View style={styles.fitnessChip}>
+            <Text style={[typography.labelSm as any, styles.fitnessLabel]}>ACTIVE TIME</Text>
+            <Text style={[typography.metricMd as any, styles.fitnessValue]}>
+              {activeMinutes} <Text style={[typography.bodySm as any, styles.fitnessUnit]}>min</Text>
+            </Text>
+          </View>
         </View>
       </GlassCard>
 
@@ -215,6 +250,26 @@ const createStyles = (colors: ThemePalette) =>
     caption: {
       color: colors.outline,
     },
+    stepHeaderRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+    },
+    stridePill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      backgroundColor: colors.iconVoltTint,
+      borderColor: colors.brand.volt,
+      borderWidth: 1,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: radius.full,
+    },
+    stridePillText: {
+      color: colors.brand.volt,
+      fontSize: 10,
+    },
     goalTrack: {
       height: 8,
       borderRadius: radius.full,
@@ -226,5 +281,32 @@ const createStyles = (colors: ThemePalette) =>
       height: '100%',
       borderRadius: radius.full,
       backgroundColor: colors.brand.volt,
+    },
+    fitnessStatsGrid: {
+      flexDirection: 'row',
+      gap: spacing.xs,
+      marginTop: spacing.xs,
+    },
+    fitnessChip: {
+      flex: 1,
+      backgroundColor: colors.track,
+      borderRadius: radius.md,
+      padding: spacing.sm,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.glass.border,
+    },
+    fitnessLabel: {
+      color: colors.outline,
+      fontSize: 9,
+      marginBottom: 3,
+    },
+    fitnessValue: {
+      color: colors.onBackground,
+      fontSize: 16,
+    },
+    fitnessUnit: {
+      color: colors.outline,
+      fontSize: 11,
     },
   });
