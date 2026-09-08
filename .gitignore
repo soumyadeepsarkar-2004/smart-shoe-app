@@ -34,3 +34,7 @@ yarn-error.*
 
 # build output
 build/
+
+# internal assets
+UIUX_styles/
+
