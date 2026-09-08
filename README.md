@@ -1,6 +1,19 @@
 # Kinetic Volt — Smart Shoe Companion App
 
-A React Native (Expo) companion experience for smart energy-harvesting footwear, built from the `UIUX_styles/DESIGN.md` design system.
+A React Native (Expo) companion experience for smart energy-harvesting footwear, built from the design system.
+
+## 📱 UI / UX Preview
+
+<p align="center">
+  <img src="assets/images/D1.jpg" width="30%" alt="Dashboard Screen" />
+  <img src="assets/images/D2.jpg" width="30%" alt="Device Control Screen" />
+  <img src="assets/images/D3.jpg" width="30%" alt="Settings & Firmware Update" />
+</p>
+
+<p align="center">
+  <img src="assets/images/ChatGPT%20Image%20Sep%207,%202026,%2011_17_43%20PM.png" width="92%" alt="Smart Footwear Design Showcase" />
+</p>
+
 
 ## Stack
 
